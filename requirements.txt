@@ -2,3 +2,5 @@ fastapi==0.115.5
 uvicorn==0.32.0
 numpy==2.0.2
 sympy==1.13.1
+pydantic==1.10.2  # Add this for data validation
+python-multipart==0.0.5  # Add this if you need to handle file uploads
