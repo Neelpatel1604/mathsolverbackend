@@ -1,3 +1,4 @@
+from http.client import HTTPException
 import numpy as np
 from fastapi.responses import JSONResponse
 from sympy import sympify, Symbol
@@ -109,20 +110,32 @@ async def solve_system(data):
         return JSONResponse(content={"error": "System has no solution or infinite solutions"}, status_code=400)
 
 async def polynomial_solver(data):
-    a = float(data.get('a'))
-    b = float(data.get('b'))
-    c = float(data.get('c'))
-    d = float(data.get('d'))
-    
-    # Assuming you have a CubicEquation class to solve cubic equations
-    equation = CubicEquation([a, b, c, d])
-    solution = equation.answers
-    
-    if solution is None or len(solution) == 0:
-        return JSONResponse(content={'result': 'No real solutions'})
-    else:
-        result = {f'x{i+1}': round(float(x), 4) for i, x in enumerate(solution)}
+    try:
+        a = float(data.get('a', 0))
+        b = float(data.get('b', 0))
+        c = float(data.get('c', 0))
+        d = float(data.get('d', 0))
+        
+        equation = CubicEquation([a, b, c, d])
+        solution = equation.answers
+        
+        if not solution:
+            return JSONResponse(content={'result': 'No solutions'})
+        
+        # Create result including both real and imaginary parts if present
+        result = {}
+        for i, root in enumerate(solution):
+            real_part = round(root.real, 4)
+            imag_part = round(root.imag, 4)
+            
+            if abs(imag_part) < 1e-10:  # Check if imaginary part is essentially zero
+                result[f'x{i+1}'] = real_part
+            else:
+                result[f'x{i+1}'] = f'{real_part} + {imag_part}i' if imag_part > 0 else f'{real_part} - {-imag_part}i'
+
         return JSONResponse(content={'result': result})
+    except Exception as e:
+        return JSONResponse(content={'error': str(e)}, status_code=400)
 
 async def matrix_operations(operation, data):
     matrix1 = data.get('matrix1')

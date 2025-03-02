@@ -33,17 +33,17 @@ async def calculate_route(request: Request):
     data = await request.json()
     return await calculate(data)
 
-@app.post("/solve_quadratic")
+@app.post("/api/solve_quadratic")
 async def quadratic_solver_route(request: Request):
     data = await request.json()
     return await quadratic_solver(data)
 
-@app.post("/solve_system")
+@app.post("/api/solve_system")
 async def solve_system_route(request: Request):
     data = await request.json()
     return await solve_system(data)
 
-@app.post("/solve_polynomial")
+@app.post("/api/solve_polynomial")
 async def polynomial_solver_route(request: Request):
     data = await request.json()
     return await polynomial_solver(data)
